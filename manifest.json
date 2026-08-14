@@ -1,7 +1,7 @@
 {
-  "name": "Chef IA - Compras & Refeições",
+  "name": "Chef IA - Compras e Refeições",
   "short_name": "Chef IA",
-  "description": "Gerencie suas compras e planeje refeições saudáveis com inteligência artificial.",
+  "description": "Gerencie suas compras e planeje refeições saudáveis com IA.",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#FAFAF7",
