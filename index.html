@@ -40,84 +40,74 @@
 
     .input-group { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
     input[type="text"], input[type="number"], input[type="password"] {
-      flex: 1; min-width: 80px; padding: 12px; border: 1px solid var(--border); border-radius: 8px;
+      flex: 1; min-width: 60px; padding: 12px; border: 1px solid var(--border); border-radius: 8px;
       font-size: 0.95rem; background: var(--bg); color: var(--text);
     }
     input:focus { outline: none; border-color: var(--primary); background: white; }
 
     .btn {
-      width: 100%; padding: 14px; border: none; border-radius: 8px;
-      font-size: 1rem; font-weight: 600; cursor: pointer; transition: 0.2s;
+      padding: 12px; border: none; border-radius: 8px;
+      font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: 0.2s;
     }
-    .btn-primary { background: var(--primary); color: white; }
-    .btn-primary:active { background: #1e3a0e; transform: scale(0.98); }
-    .btn-accent { background: var(--accent); color: var(--primary); }
-    .btn-accent:active { background: #b8902e; transform: scale(0.98); }
+    .btn-primary { background: var(--primary); color: white; flex: 1; }
+    .btn-primary:active { background: #1e3a0e; }
+    .btn-accent { background: var(--accent); color: var(--primary); width: 100%; padding: 14px; font-size: 1rem;}
+    .btn-accent:active { background: #b8902e; }
     .btn-sm { width: auto; padding: 12px 20px; flex: 0; }
-    .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); padding: 8px 12px; width: auto; font-size: 0.8rem; border-radius: 6px; cursor: pointer; font-weight: bold;}
+    .btn-actions { background: transparent; border: 1px solid var(--border); padding: 6px 10px; font-size: 0.8rem; color: var(--text-light);}
+    .btn-actions:active { background: var(--bg); }
+    .btn-edit { color: var(--primary); border-color: var(--primary); }
+    .btn-del { color: var(--danger); border-color: var(--danger); }
     .btn-outline { background: transparent; color: var(--text-light); border: 1px solid var(--border); width: auto; padding: 8px 12px; font-size: 0.8rem; border-radius: 6px; cursor: pointer;}
 
     .total-display {
       background: var(--primary-light); color: var(--primary); padding: 15px; border-radius: 8px;
       text-align: center; font-size: 1.2rem; font-weight: bold; margin-bottom: 15px; border: 1px solid #c4dab3;
     }
-    .list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); }
+    .list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border); gap: 10px; }
     .list-item:last-child { border-bottom: none; }
-    .item-info { flex: 1; }
-    .item-name { font-weight: 600; }
+    .item-info { flex: 1; min-width: 0; } /* min-width 0 evita que o texto quebre o layout */
+    .item-name { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .item-details { font-size: 0.85rem; color: var(--text-light); margin-top: 2px; }
-    .item-price { font-weight: bold; color: var(--primary); margin: 0 15px; white-space: nowrap; }
+    .item-price { font-weight: bold; color: var(--primary); white-space: nowrap; }
+    .item-actions { display: flex; gap: 5px; }
+    
+    /* Formulário de Edição Inline */
+    .edit-form { display: flex; gap: 5px; width: 100%; align-items: center; }
+    .edit-form input { padding: 8px; font-size: 0.85rem; margin: 0; }
+    .edit-form button { padding: 8px; font-size: 0.8rem; }
+
     .empty-state { text-align: center; color: var(--text-light); padding: 30px 0; }
 
-    /* --- ESTILOS DO CHAT (WhatsApp Style) --- */
+    /* Chat */
     .chat-container {
-      background: #E5DDD5; /* Cor de fundo padrão do chat */
-      border-radius: var(--radius); padding: 15px; height: 50vh; 
-      display: flex; flex-direction: column; margin-bottom: 10px;
-      border: 1px solid var(--border);
+      background: #E5DDD5; border-radius: var(--radius); padding: 15px; height: 50vh; 
+      display: flex; flex-direction: column; margin-bottom: 10px; border: 1px solid var(--border);
       background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c8c4bc' fill-opacity='0.15'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
     }
     .chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-bottom: 10px;}
-    .chat-bubble {
-      max-width: 85%; padding: 10px 14px; border-radius: 8px; position: relative;
-      font-size: 0.9rem; line-height: 1.4; box-shadow: 0 1px 1px rgba(0,0,0,0.1);
-      white-space: pre-wrap; word-wrap: break-word;
-    }
-    .chat-ai { background: white; align-self: flex-start; border-top-left-radius: 0; color: var(--text); }
-    .chat-user { background: #D9FDD3; align-self: flex-end; border-top-right-radius: 0; color: var(--text); }
-    
+    .chat-bubble { max-width: 85%; padding: 10px 14px; border-radius: 8px; font-size: 0.9rem; line-height: 1.4; box-shadow: 0 1px 1px rgba(0,0,0,0.1); white-space: pre-wrap; word-wrap: break-word; }
+    .chat-ai { background: white; align-self: flex-start; border-top-left-radius: 0; }
+    .chat-user { background: #D9FDD3; align-self: flex-end; border-top-right-radius: 0; }
     .chat-input-area { display: flex; gap: 8px; margin-top: 10px; background: var(--bg); padding: 10px; border-radius: 8px;}
     .chat-input-area input { border: none; background: transparent; padding: 0 10px; flex: 1; font-size: 0.95rem;}
     .chat-input-area input:focus { outline: none; }
     .chat-send-btn { background: var(--primary); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-    /* --- ESTILOS DO MENU SEMANAL --- */
-    .recipe-box {
-      background: #FDFCF8; border-left: 4px solid var(--accent); padding: 20px;
-      border-radius: 0 8px 8px 0; margin-top: 15px; white-space: pre-wrap; line-height: 1.6;
-      font-size: 0.9rem; display: none;
-    }
+    .recipe-box { background: #FDFCF8; border-left: 4px solid var(--accent); padding: 20px; border-radius: 0 8px 8px 0; margin-top: 15px; white-space: pre-wrap; line-height: 1.6; font-size: 0.9rem; display: none; }
 
     .alert { padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 0.9rem; display: none; }
     .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
     .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
 
-    .bottom-nav {
-      position: fixed; bottom: 0; left: 0; right: 0; background: var(--card);
-      border-top: 1px solid var(--border); display: flex; justify-content: space-around;
-      align-items: center; height: 70px; z-index: 100; box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
-    }
-    .nav-item {
-      display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-light);
-      text-decoration: none; font-size: 0.7rem; font-weight: 500; cursor: pointer; transition: 0.2s;
-    }
+    .bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; background: var(--card); border-top: 1px solid var(--border); display: flex; justify-content: space-around; align-items: center; height: 70px; z-index: 100; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); }
+    .nav-item { display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--text-light); text-decoration: none; font-size: 0.7rem; font-weight: 500; cursor: pointer; transition: 0.2s; }
     .nav-item.active { color: var(--primary); }
     .nav-item svg { width: 24px; height: 24px; fill: currentColor; }
 
     .loading { text-align: center; padding: 20px; color: var(--text-light); font-style: italic; display: none; }
     .spinner { border: 3px solid var(--border); border-top: 3px solid var(--primary); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; margin-right: 10px; vertical-align: middle;}
     @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-    
     .header-chat { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;}
   </style>
 </head>
@@ -126,7 +116,7 @@
   <div id="app"></div>
 
   <script>
-    // --- INJEÇÃO DE HTML SEGURA ---
+    // --- INJEÇÃO DE HTML ---
     document.getElementById('app').innerHTML = `
       <header class="header">
         <h1>🌿 Chef IA</h1>
@@ -134,8 +124,6 @@
       </header>
 
       <main class="container">
-        
-        <!-- ABA 1: LISTA + CHAT -->
         <div id="sec-lista" class="section active">
           <div class="card">
             <div class="total-display">Total Estimado: R$ <span id="valorTotal">0,00</span></div>
@@ -167,11 +155,10 @@
           </div>
         </div>
 
-        <!-- ABA 2: MENU SEMANAL IA -->
         <div id="sec-ia" class="section">
           <div class="card">
             <h2 style="margin-bottom: 10px;">🥗 Planejamento Inteligente</h2>
-            <p style="font-size: 0.9rem; color: var(--text-light); margin-bottom: 20px;">Gere um cardápio de 7 dias focado em saúde, evitando repetições e usando sua lista de compras.</p>
+            <p style="font-size: 0.9rem; color: var(--text-light); margin-bottom: 20px;">Gere um cardápio de 7 dias focado em saúde.</p>
             <button id="btnGerarReceita" class="btn btn-accent">Gerar Menu Semanal Saudável</button>
             <div id="loadingIa" class="loading"><div class="spinner"></div> Criando seu menu de 7 dias...</div>
             <div id="receitaBox" class="recipe-box"></div>
@@ -179,7 +166,6 @@
           </div>
         </div>
 
-        <!-- ABA 3: CONFIGURAÇÕES -->
         <div id="sec-config" class="section">
           <div class="card">
             <h2 style="margin-bottom: 15px;">⚙️ Configurações</h2>
@@ -192,7 +178,6 @@
             </form>
           </div>
         </div>
-
       </main>
 
       <nav class="bottom-nav">
@@ -212,32 +197,29 @@
     `;
 
     // ==========================================
-    // ESTADO DA APLICAÇÃO (Dados salvos)
+    // ESTADO DA APLICAÇÃO
     // ==========================================
     let listaCompras = JSON.parse(localStorage.getItem('listaCompras')) || [];
-    // Histórico do chat salva as mensagens para manter contexto
     let chatHistory = JSON.parse(localStorage.getItem('chatHistory')) || [
       { role: "assistant", content: "Olá! Sou seu Chef particular. Como posso ajudar com sua lista ou receitas hoje?" }
     ];
     let deferredPrompt;
+    let editIndex = -1; // Controla qual item está sendo editado (-1 = nenhum)
 
     // ==========================================
     // 1. NAVEGAÇÃO
     // ==========================================
-    const navItems = document.querySelectorAll('.nav-item');
-    const sections = document.querySelectorAll('.section');
-
-    navItems.forEach(item => {
+    document.querySelectorAll('.nav-item').forEach(item => {
       item.addEventListener('click', () => {
-        navItems.forEach(n => n.classList.remove('active'));
-        sections.forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
         item.classList.add('active');
         document.getElementById(item.dataset.target).classList.add('active');
       });
     });
 
     // ==========================================
-    // 2. LISTA DE COMPRAS
+    // 2. LISTA DE COMPRAS (COM EDITAR E CONFIRMAR EXCLUSÃO)
     // ==========================================
     const formItem = document.getElementById('formItem');
     const listaItensDiv = document.getElementById('listaItens');
@@ -258,16 +240,36 @@
         listaItensDiv.innerHTML = '<div class="empty-state">Sua lista está vazia.</div>';
         return;
       }
-      listaItensDiv.innerHTML = listaCompras.map((item, index) => `
-        <div class="list-item">
-          <div class="item-info">
-            <div class="item-name">${item.nome}</div>
-            <div class="item-details">${item.qtd}x • R$ ${parseFloat(item.preco).toFixed(2)} cada</div>
-          </div>
-          <div class="item-price">R$ ${(item.qtd * item.preco).toFixed(2)}</div>
-          <button class="btn-danger" onclick="removerItem(${index})">X</button>
-        </div>
-      `).join('');
+
+      listaItensDiv.innerHTML = listaCompras.map((item, index) => {
+        // Se o index for o que está sendo editado, mostra o formulário inline
+        if (index === editIndex) {
+          return `
+            <div class="list-item">
+              <form class="edit-form" onsubmit="salvarEdicao(event, ${index})">
+                <input type="text" id="editNome" value="${item.nome}" required>
+                <input type="number" id="editQtd" value="${item.qtd}" min="1" required style="max-width: 60px;">
+                <input type="number" id="editPreco" value="${item.preco}" min="0" step="0.01" required style="max-width: 80px;">
+                <button type="submit" class="btn btn-primary btn-sm" style="background:#27AE60; flex:0;">OK</button>
+                <button type="button" class="btn btn-actions btn-del" onclick="cancelarEdicao()">X</button>
+              </form>
+            </div>`;
+        }
+
+        // Layout normal com os botões
+        return `
+          <div class="list-item">
+            <div class="item-info">
+              <div class="item-name">${item.nome}</div>
+              <div class="item-details">${item.qtd}x • R$ ${parseFloat(item.preco).toFixed(2)} cada</div>
+            </div>
+            <div class="item-price">R$ ${(item.qtd * item.preco).toFixed(2)}</div>
+            <div class="item-actions">
+              <button class="btn btn-actions btn-edit" onclick="iniciarEdicao(${index})">✏️</button>
+              <button class="btn btn-actions btn-del" onclick="confirmarExclusao(${index})">🗑️</button>
+            </div>
+          </div>`;
+      }).join('');
     }
 
     function calcularTotal() {
@@ -275,9 +277,35 @@
       valorTotalSpan.textContent = total.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
     }
 
-    window.removerItem = function(index) {
-      listaCompras.splice(index, 1);
+    // Funções globais para os botões inline
+    window.iniciarEdicao = function(index) {
+      editIndex = index;
+      renderizarLista();
+      // Foca no nome automaticamente
+      document.getElementById('editNome').focus();
+    };
+
+    window.cancelarEdicao = function() {
+      editIndex = -1;
+      renderizarLista();
+    };
+
+    window.salvarEdicao = function(e, index) {
+      e.preventDefault();
+      listaCompras[index].nome = document.getElementById('editNome').value.trim();
+      listaCompras[index].qtd = parseInt(document.getElementById('editQtd').value);
+      listaCompras[index].preco = parseFloat(document.getElementById('editPreco').value);
+      editIndex = -1;
       atualizarTela();
+    };
+
+    window.confirmarExclusao = function(index) {
+      const nomeItem = listaCompras[index].nome;
+      // Usa o confirm() nativo do navegador/celular
+      if (confirm(`Tem certeza que deseja apagar "${nomeItem}"?`)) {
+        listaCompras.splice(index, 1);
+        atualizarTela();
+      }
     };
 
     formItem.addEventListener('submit', (e) => {
@@ -294,12 +322,11 @@
     atualizarTela();
 
     // ==========================================
-    // 3. SISTEMA DE CHAT (CONVERSA LIVRE)
+    // 3. SISTEMA DE CHAT
     // ==========================================
     const formChat = document.getElementById('formChat');
     const inChat = document.getElementById('inChat');
     const chatMessages = document.getElementById('chatMessages');
-    const btnLimparChat = document.getElementById('btnLimparChat');
 
     function renderizarChat() {
       chatMessages.innerHTML = chatHistory.map(msg => {
@@ -309,10 +336,9 @@
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
-    // Renderiza o histórico salvo ao abrir
     renderizarChat();
 
-    btnLimparChat.addEventListener('click', () => {
+    document.getElementById('btnLimparChat').addEventListener('click', () => {
       chatHistory = [{ role: "assistant", content: "Chat limpo! Como posso ajudar?" }];
       localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
       renderizarChat();
@@ -326,16 +352,11 @@
       const apiKey = localStorage.getItem('groqApiKey');
       if (!apiKey) { alert('Configure sua chave do Groq na aba Config.'); return; }
 
-      // Adiciona msg do usuário na tela e no histórico
       chatHistory.push({ role: "user", content: textoUsuario });
       inChat.value = '';
       renderizarChat();
 
-      // Prepara prompt de sistema INJETANDO a lista de compras atual para dar contexto à IA
-      const sistemaPrompt = `Você é um Chef Italiano focado em saúde, especialista em Dieta Mediterrânea para controle de glicose e colesterol. 
-Responda de forma direta, amigável e simples. 
-A lista de compras atual que o usuário tem na geladeira/ despensa é:
- ${getListaFormatada() || "Nenhum item na lista ainda."}`;
+      const sistemaPrompt = `Você é um Chef Italiano focado em saúde, especialista em Dieta Mediterrânea. Responda de forma simples. Lista atual do usuário: \n${getListaFormatada() || "Nenhum item."}`;
 
       try {
         const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -345,30 +366,26 @@ A lista de compras atual que o usuário tem na geladeira/ despensa é:
             model: "llama-3.3-70b-versatile",
             messages: [
               { role: "system", content: sistemaPrompt },
-              ...chatHistory // Envia todo o histórico para manter a conversa fluida
+              ...chatHistory
             ],
             temperature: 0.7,
             max_tokens: 600
           })
         });
 
-        if (!response.ok) throw new Error("Erro na API Groq.");
-        
+        if (!response.ok) throw new Error("Erro ao contatar a IA.");
         const data = await response.json();
-        const respostaIa = data.choices[0].message.content;
-        
-        chatHistory.push({ role: "assistant", content: respostaIa });
+        chatHistory.push({ role: "assistant", content: data.choices[0].message.content });
         localStorage.setItem('chatHistory', JSON.stringify(chatHistory));
         renderizarChat();
-
       } catch (error) {
-        chatHistory.push({ role: "assistant", content: "Desculpe, tive um problema de conexão." });
+        chatHistory.push({ role: "assistant", content: "Ops, erro de conexão." });
         renderizarChat();
       }
     });
 
     // ==========================================
-    // 4. MENU SEMANAL (BOTÃO PRINCIPAL)
+    // 4. MENU SEMANAL
     // ==========================================
     const btnGerar = document.getElementById('btnGerarReceita');
     const loadingIa = document.getElementById('loadingIa');
@@ -377,10 +394,97 @@ A lista de compras atual que o usuário tem na geladeira/ despensa é:
 
     btnGerar.addEventListener('click', async () => {
       const apiKey = localStorage.getItem('groqApiKey');
-      if (!apiKey) { alert('Vá em Configurações e insira sua chave da API do Groq.'); return; }
-      if (listaCompras.length === 0) { alert('Adicione itens na lista de compras antes de gerar o menu.'); return; }
+      if (!apiKey) { alert('Configure a chave na aba Config.'); return; }
+      if (listaCompras.length === 0) { alert('Adicione itens na lista primeiro.'); return; }
 
-      const ingredientes = getListaFormatada();
+      const promptSistema = `Você é um Nutricionista e Chef italiano (Dieta Mediterrânea para glicose e colesterol). REGRA ESTRITA: Gere OBRIGATORIAMENTE um cardápio de 7 dias (Segunda a Domingo), com Almoço e Jantar. NÃO repita pratos principais em dias seguidos. Use os ingredientes da lista. Formato: **Segunda-feira** - Almoço: ... - Jantar: ...`;
 
-      // Instrução Estrita para o Menu
-      const promptSistema = `Você é um Nutricionista e C
+      loadingIa.style.display = 'block';
+      receitaBox.style.display = 'none';
+      btnCopiar.style.display = 'none';
+
+      try {
+        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+          method: "POST",
+          headers: { "Authorization": `Bearer ${apiKey}`, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            model: "llama-3.3-70b-versatile",
+            messages: [
+              { role: "system", content: promptSistema },
+              { role: "user", content: `Lista de compras:\n\n${getListaFormatada()}\n\nCrie o menu de 7 dias.` }
+            ],
+            temperature: 0.5, max_tokens: 1500
+          })
+        });
+
+        if (!response.ok) throw new Error("Erro na API.");
+        const data = await response.json();
+        receitaBox.textContent = data.choices[0].message.content;
+        receitaBox.style.display = 'block';
+        btnCopiar.style.display = 'inline-block';
+      } catch (error) {
+        receitaBox.textContent = `Erro: ${error.message}`;
+        receitaBox.style.display = 'block';
+      } finally {
+        loadingIa.style.display = 'none';
+      }
+    });
+
+    btnCopiar.addEventListener('click', () => {
+      navigator.clipboard.writeText(receitaBox.textContent).then(() => {
+        const txt = btnCopiar.textContent;
+        btnCopiar.textContent = '✅ Copiado!';
+        setTimeout(() => btnCopiar.textContent = txt, 2000);
+      });
+    });
+
+    // ==========================================
+    // 5. CONFIGURAÇÕES
+    // ==========================================
+    const formConfig = document.getElementById('formConfig');
+    const inApiKey = document.getElementById('inApiKey');
+    const msgAlert = document.getElementById('msgAlert');
+    inApiKey.value = localStorage.getItem('groqApiKey') || "";
+
+    formConfig.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const key = inApiKey.value.trim();
+      if (key.length < 10) {
+        msgAlert.textContent = "Chave muito curta.";
+        msgAlert.className = "alert alert-error"; msgAlert.style.display = "block";
+        return;
+      }
+      localStorage.setItem('groqApiKey', key);
+      msgAlert.textContent = "Chave salva com sucesso!";
+      msgAlert.className = "alert alert-success"; msgAlert.style.display = "block";
+      setTimeout(() => msgAlert.style.display = 'none', 3000);
+    });
+
+    // ==========================================
+    // 6. PWA & SERVICE WORKER
+    // ==========================================
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      document.getElementById('btnInstall').style.display = 'block';
+    });
+
+    document.getElementById('btnInstall').addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        await deferredPrompt.userChoice;
+        deferredPrompt = null;
+        document.getElementById('btnInstall').style.display = 'none';
+      }
+    });
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('SW Atualizado com sucesso!'))
+          .catch(err => console.log('Erro SW:', err));
+      });
+    }
+  </script>
+</body>
+</html>
