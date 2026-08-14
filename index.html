@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#2D5016">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Chef IA - Compras & Refeições</title>
+  
+  <!-- Manifesto PWA -->
+  <link rel="manifest" href="manifest.json">
+  <!-- Ícone para iOS -->
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3075/3075977.png">
+
+  <style>
+    /* --- VARIÁVEIS E RESET (TEMA MEDITERRÂNEO LIMPO) --- */
+    :root {
+      --bg: #FAFAF7;
+      --card: #FFFFFF;
+      --primary: #2D5016; /* Verde oliva escuro */
+      --primary-light: #E8F0E0;
+      --accent: #D4A843; /* Dourado azeite */
+      --text: #333333;
+      --text-light: #666666;
+      --border: #E0E0D8;
+      --danger: #C0392B;
+      --radius: 12px;
+      --shadow: 0 4px 15px rgba(0,0,0,0.05);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+    
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding-bottom: 100px; /* Espaço para o menu fixo */
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* --- TOPO FIXO --- */
+    .header {
+      position: fixed; top: 0; left: 0; right: 0;
+      background: var(--primary);
+      color: white;
+      padding: 16px 20px;
+      display: flex; justify-content: space-between; align-items: center;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    }
+    .header h1 { font-size: 1.2rem; font-weight: 600; }
+    .install-btn {
+      background: var(--accent); color: var(--primary); border: none;
+      padding: 6px 12px; border-radius: 20px; font-weight: bold; font-size: 0.8rem;
+      cursor: pointer; display: none; /* Escondido até o navegador aceitar instalar */
+    }
+
+    /* --- CONTEÚDO PRINCIPAL --- */
+    .container { padding: 90px 16px 20px; max-width: 600px; margin: 0 auto; }
+    .section { display: none; } /* Controla as abas */
+    .section.active { display: block; animation: fadeIn 0.3s ease; }
+    
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+
+    /* --- FORMULÁRIO DE ITENS --- */
+    .input-group { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+    input, select {
+      flex: 1; min-width: 80px;
+      padding: 12px; border: 1px solid var(--border); border-radius: 8px;
+      font-size: 0.95rem; background: var(--bg); color: var(--text);
+    }
+    input:focus { outline: none; border-color: var(--primary); background: white; }
+
+    .btn {
+      width: 100%; padding: 14px; border: none; border-radius: 8px;
+      font-size: 1rem; font-weight: 600; cursor: pointer; transition: 0.2s;
+    }
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:active { background: #1e3a0e; transform: scale(0.98); }
+    .btn-accent { background: var(--accent); color: var(--primary); }
+    .btn-accent:active { background: #b8902e; transform: scale(0.98); }
+    .btn-danger { background: transparent; color: var(--danger); border: 1px solid var(--danger); padding: 8px; width: auto; }
+    
+    /* --- TABELA DE LISTA --- */
+    .total-display {
+      background: var(--primary-light); color: var(--primary);
+      padding: 15px; border-radius: 8px; text-align: center;
+      font-size: 1.2rem; font-weight: bold; margin-bottom: 15px;
+      border: 1px solid #c4dab3;
+    }
+    .list-item {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 12px 0; border-bottom: 1px solid var(--border);
+    }
+    .list-item:last-child { border-bottom: none; }
+    .item-info { flex: 1; }
+    .item-name { font-weight: 600; }
+    .item-details { font-size: 0.85rem; color: var(--text-light); margin-top: 2px; }
+    .item-price { font-weight: bold; color: var(--primary); margin: 0 15px; }
+    .empty-state { text-align: center; color: var(--text-light); padding: 30px 0; }
+
+    /* --- AREA DA IA --- */
+    .recipe-box {
+      background: #FDFCF8; border-left: 4px solid var(--accent);
+      padding: 20px; border-radius: 0 8px 8px 0; margin-top: 15px;
+      white-space: pre-wrap; line-height: 1.6; font-size: 0.95rem;
+      display: none;
+    }
+    .copy-btn {
+      margin-top: 10px; background: var(--border); color: var(--text); padding: 8px 16px;
+      border: none; border-radius: 6px; cursor: pointer; font-size: 0.85rem;
+    }
+
+    /* --- CONFIGURAÇÕES --- */
+    .alert {
+      padding: 12px; border-radius: 8px; margin-bottom: 15px; font-size: 0.9rem; display: none;
+    }
+    .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+
+    /* --- MENU INFERIOR (MOBILE FIRST) --- */
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: var(--card); border-top: 1px solid var(--border);
+      display: flex; justify-content: space-around; align-items: center;
+      height: 70px; z-index: 100; box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+    }
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      color: var(--text-light); text-decoration: none; font-size: 0.7rem; font-weight: 500;
+      cursor: pointer; transition: 0.2s;
+    }
+    .nav-item.active { color: var(--primary); }
+    .nav-item svg { width: 24px; height: 24px; fill: currentColor; }
+
+    /* Loading */
+    .loading { text-align: center; padding: 20px; color: var(--text-light); font-style: italic; }
+    .spinner { border: 3px solid var(--border); border-top: 3px solid var(--primary); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; margin-right: 10px; vertical-align: middle;}
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+  </style>
+</head>
+<body>
+
+  <!-- CABEÇALHO -->
+  <header class="header">
+    <h1>🌿 Chef IA</h1>
+    <button id="btnInstall" class="install-btn">Instalar App</button>
+  </header>
+
+  <!-- CONTEÚDO -->
+  <main class="container">
+    
+    <!-- ABA 1: LISTA DE COMPRAS -->
+    <div id="sec-lista" class="section active">
+      <div class="card">
+        <div class="total-display">
+          Total Estimado: R$ <span id="valorTotal">0,00</span>
+        </div>
+        
+        <form id="formItem" class="input-group">
+          <input type="text" id="inNome" placeholder="Ex: Abobrinha" required>
+          <input type="number" id="inQtd" placeholder="Qtd" min="1" step="1" required>
+          <input type="number" id="inPreco" placeholder="R$ Unit." min="0" step="0.01" required>
+          <button type="submit" class="btn btn-primary" style="width: auto; flex: 0;">+</button>
+        </form>
+
+        <div id="listaItens">
+          <div class="empty-state">Sua lista está vazia. Adicione itens acima.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ABA 2: IA CHEF -->
+    <div id="sec-ia" class="section">
+      <div class="card">
+        <h2 style="margin-bottom: 10px;">🧑‍🍳 Sugerir Prato do Dia com IA</h2>
+        <p style="font-size: 0.9rem; color: var(--text-light); margin-bottom: 20px;">
+          Com base nos itens da sua lista de compras, nossa IA criará uma receita saudável (Foco em Dieta Mediterrânea, controle de glicose e colesterol).
+        </p>
+        <button id="btnGerarReceita" class="btn btn-accent">Gerar Receita com Groq AI</button>
+        
+        <div id="loadingIa" class="loading" style="display:none;">
+          <div class="spinner"></div> Consultando o Chef...
+        </div>
+
+        <div id="receitaBox" class="recipe-box"></div>
+        <button id="btnCopiar" class="copy-btn" style="display:none;">📋 Copiar Receita</button>
+      </div>
+    </div>
+
+    <!-- ABA 3: CONFIGURAÇÕES -->
+    <div id="sec-config" class="section">
+      <div class="card">
+        <h2 style="margin-bottom: 15px;">⚙️ Configurações</h2>
+        <div id="msgAlert" class="alert"></div>
+        <p style="font-size: 0.9rem; margin-bottom: 10px;">Insira sua chave da API do Groq para habilitar a geração de receitas.</p>
+        <p style="font-size: 0.8rem; color: var(--text-light); margin-bottom: 20px;">
+          Sua chave é salva <b>apenas no seu dispositivo</b> (LocalStorage) e enviada diretamente para a Groq.
+        </p>
+        <form id="formConfig" class="input-group" style="flex-direction: column; gap: 15px;">
+          <input type="password" id="inApiKey" placeholder="gsk_xxxxxxxxxxxxxxxx">
+          <button type="submit" class="btn btn-primary">Salvar Chave com Segurança</button>
+        </form>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- MENU INFERIOR -->
+  <nav class="bottom-nav">
+    <div class="nav-item active" data-target="sec-lista">
+      <svg viewBox="0 0 24 24"><path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0020 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/></svg>
+      Compras
+    </div>
+    <div class="nav-item" data-target="sec-ia">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+      Chef IA
+    </div>
+    <div class="nav-item" data-target="sec-config">
+      <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.07.62-.07.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+      Config
+    </div>
+  </nav>
+
+  <script>
+    // ==========================================
+    // 1. VARIÁVEIS E ESTADO DA APLICAÇÃO
+    // ==========================================
+    let listaCompras = JSON.parse(localStorage.getItem('listaCompras')) || [];
+    let deferredPrompt; // Variável necessária para o botão "Instalar" do PWA
+
+    // ==========================================
+    // 2. NAVEGAÇÃO POR ABAS (SPA)
+    // ==========================================
+    const navItems = document.querySelectorAll('.nav-item');
+    const sections = document.querySelectorAll('.section');
+
+    navItems.forEach(item => {
+      item.addEventListener('click', () => {
+        // Remove a classe active de todas as abas e seções
+        navItems.forEach(n => n.classList.remove('active'));
+        sections.forEach(s => s.classList.remove('active'));
+        
+        // Adiciona a classe active na aba clicada e na seção correspondente
+        item.classList.add('active');
+        document.getElementById(item.dataset.target).classList.add('active');
+      });
+    });
+
+    // ==========================================
+    // 3. LÓGICA DA LISTA DE COMPRAS
+    // ==========================================
+    const formItem = document.getElementById('formItem');
+    const listaItensDiv = document.getElementById('listaItens');
+    const valorTotalSpan = document.getElementById('valorTotal');
+
+    // Função para salvar no LocalStorage e renderizar a tela
+    function atualizarTela() {
+      localStorage.setItem('listaCompras', JSON.stringify(listaCompras));
+      renderizarLista();
+      calcularTotal();
+    }
+
+    function renderizarLista() {
+      if (listaCompras.length === 0) {
+        listaItensDiv.innerHTML = '<div class="empty-state">Sua lista está vazia. Adicione itens acima.</div>';
+        return;
+      }
+
+      listaItensDiv.innerHTML = listaCompras.map((item, index) => `
+        <div class="list-item">
+          <div class="item-info">
+            <div class="item-name">${item.nome}</div>
+            <div class="item-details">${item.qtd}x • R$ ${parseFloat(item.preco).toFixed(2)} cada</div>
+          </div>
+          <div class="item-price">R$ ${(item.qtd * item.preco).toFixed(2)}</div>
+          <button class="btn-danger" onclick="removerItem(${index})">X</button>
+        </div>
+      `).join('');
+    }
+
+    function calcularTotal() {
+      const total = listaCompras.reduce((acc, item) => acc + (item.qtd * item.preco), 0);
+      valorTotalSpan.textContent = total.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+    }
+
+    function removerItem(index) {
+      listaCompras.splice(index, 1);
+      atualizarTela();
+    }
+
+    // Adicionar item
+    formItem.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const nome = document.getElementById('inNome').value.trim();
+      const qtd = parseInt(document.getElementById('inQtd').value);
+      const preco = parseFloat(document.getElementById('inPreco').value);
+
+      if (!nome || isNaN(qtd) || isNaN(preco)) return;
+
+      listaCompras.push({ nome, qtd, preco });
+      formItem.reset();
+      atualizarTela();
+    });
+
+    // Renderiza a lista ao abrir a página
+    atualizarTela();
+
+    // ==========================================
+    // 4. CONFIGURAÇÕES (API KEY GROQ)
+    // ==========================================
+    const formConfig = document.getElementById('formConfig');
+    const inApiKey = document.getElementById('inApiKey');
+    const msgAlert = document.getElementById('msgAlert');
+
+    // Preenche o input se já houver chave salva
+    inApiKey.value = localStorage.getItem('groqApiKey') || '';
+
+    function mostrarAlerta(msg, tipo) {
+      msgAlert.textContent = msg;
+      msgAlert.className = `alert alert-${tipo}`;
+      msgAlert.style.display = 'block';
+      setTimeout(() => msgAlert.style.display = 'none', 3000);
+    }
+
+    formConfig.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const key = inApiKey.value.trim();
+      if (key.length < 10) {
+        mostrarAlerta('Por favor, insira uma chave de API válida.', 'error');
+        return;
+      }
+      localStorage.setItem('groqApiKey', key);
+      mostrarAlerta('Chave salva com sucesso no dispositivo!', 'success');
+    });
+
+    // ==========================================
+    // 5. INTEGRAÇÃO COM A IA (GROQ)
+    // ==========================================
+    const btnGerar = document.getElementById('btnGerarReceita');
+    const loadingIa = document.getElementById('loadingIa');
+    const receitaBox = document.getElementById('receitaBox');
+    const btnCopiar = document.getElementById('btnCopiar');
+
+    btnGerar.addEventListener('click', async () => {
+      const apiKey = localStorage.getItem('groqApiKey');
+      
+      if (!apiKey) {
+        alert('Por favor, vá em Configurações e insira sua chave da API do Groq.');
+        return;
+      }
+
+      if (listaCompras.length === 0) {
+        alert('Adicione pelo menos um item na sua lista de compras para gerar uma receita.');
+        return;
+      }
+
+      // Prepara a lista de ingredientes para o prompt
+      const ingredientes = listaCompras.map(i => `- ${i.nome} (Quantidade: ${i.qtd})`).join('\n");
+
+      const promptSistema = `Você é um Chef Italiano focado em saúde, especialista em Dieta Mediterrânea para controle de glicose e colesterol. 
+      Sua missão é criar uma receita detalhada (Almoço ou Jantar) usando PRIORITARIAMENTE os ingredientes disponíveis na lista fornecida pelo usuário.
+      A receita deve ter: Nome do Prato, Tempo de Preparo, Ingredientes Utilizados, e Modo de Preparo passo a passo de forma simples.
+      Mantenha um tom acolhedor e incentive a saúde do coração.`;
+
+      // Configuração da requisição para a API do Groq
+      const requisicao = {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${apiKey}`,
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "llama-3.3-70b-versatile", // Modelo ultra-rápido solicitado
+          messages: [
+            { role: "system", content: promptSistema },
+            { role: "user", content: `Aqui estão os ingredientes que acabei de comprar e tenho disponíveis na minha cozinha hoje:\n\n${ingredientes}\n\nCrie uma receita maravilhosa e saudável para mim.` }
+          ],
+          temperature: 0.7,
+          max_tokens: 1024
+        })
+      };
+
+      // UI: Estado de carregamento
+      loadingIa.style.display = 'block';
+      receitaBox.style.display = 'none';
+      btnCopiar.style.display = 'none';
+
+      try {
+        const response = await fetch("https://api.groq.com/openai/v1/chat/completions", requisicao);
+        
+        if (!response.ok) {
+          const erroData = await response.json();
+          throw new Error(erroData.error?.message || "Erro na API Groq.");
+        }
+
+        const data = await response.json();
+        const textoReceita = data.choices[0].message.content;
+
+        // Exibe a receita
+        receitaBox.textContent = textoReceita;
+        receitaBox.style.display = 'block';
+        btnCopiar.style.display = 'inline-block';
+
+      } catch (error) {
+        receitaBox.textContent = `Erro ao gerar receita: ${error.message}`;
+        receitaBox.style.display = 'block';
+      } finally {
+        loadingIa.style.display = 'none';
+      }
+    });
+
+    // Botão Copiar
+    btnCopiar.addEventListener('click', () => {
+      navigator.clipboard.writeText(receitaBox.textContent)
+        .then(() => {
+          const txtOriginal = btnCopiar.textContent;
+          btnCopiar.textContent = '✅ Copiado!';
+          setTimeout(() => btnCopiar.textContent = txtOriginal, 2000);
+        });
+    });
+
+    // ==========================================
+    // 6. LÓGICA PWA (INSTALAÇÃO)
+    // ==========================================
+    window.addEventListener('beforeinstallprompt', (e) => {
+      // Previne o popup padrão do Chrome
+      e.preventDefault();
+      // Guarda o evento para usar depois
+      deferredPrompt = e;
+      // Mostra o botão de instalar no header
+      document.getElementById('btnInstall').style.display = 'block';
+    });
+
+    document.getElementById('btnInstall').addEventListener('click', async () => {
+      if (deferredPrompt) {
+        // Mostra o prompt de instalação nativo
+        deferredPrompt.prompt();
+        // Espera o usuário responder
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === 'accepted') {
+          console.log('Usuário instalou o PWA');
+        }
+        // Limpa a variável, só pode ser usado uma vez
+        deferredPrompt = null;
+        document.getElementById('btnInstall').style.display = 'none';
+      }
+    });
+
+    // ==========================================
+    // 7. REGISTRO DO SERVICE WORKER
+    // ==========================================
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(reg => console.log('Service Worker registrado: ', reg.scope))
+          .catch(err => console.log('Falha ao registrar SW: ', err));
+      });
+    }
+  </script>
+</body>
+          </html>
