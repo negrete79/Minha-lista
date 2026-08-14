@@ -1,24 +1,39 @@
-{
-  "name": "Chef IA - Compras & Refeições",
-  "short_name": "Chef IA",
-  "description": "Gerencie suas compras e planeje refeições saudáveis com inteligência artificial.",
-  "start_url": "./index.html",
-  "display": "standalone",
-  "background_color": "#FAFAF7",
-  "theme_color": "#2D5016",
-  "orientation": "portrait",
-  "icons": [
-    {
-      "src": "https://cdn-icons-png.flaticon.com/512/3075/3075977.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "https://cdn-icons-png.flaticon.com/512/3075/3075977.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
-  ]
-}
+const CACHE_NAME = 'chef-ia-v1';
+const urlsToCache = [
+  './',
+  './index.html',
+  './manifest.json',
+  'https://cdn-icons-png.flaticon.com/512/3075/3075977.png'
+];
+
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(urlsToCache))
+  );
+  self.skipWaiting();
+});
+
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request)
+      .then(response => {
+        return response || fetch(event.request);
+      })
+  );
+});
+
+self.addEventListener('activate', event => {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+  self.clients.claim();
+});
